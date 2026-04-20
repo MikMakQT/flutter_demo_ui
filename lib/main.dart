@@ -9,7 +9,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'views/create_item_view.dart';
 import 'views/home_view.dart';
 import 'views/import_item_view.dart';
-import 'views/main_view.dart';
 import 'views/profile_view.dart';
 import 'views/shared_items_view.dart';
 
@@ -42,28 +41,6 @@ class MyApp extends StatelessWidget {
           : '/home',
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
-          case '/info':
-            return PageRouteBuilder(
-              transitionDuration: const Duration(milliseconds: 2000),
-              reverseTransitionDuration: const Duration(milliseconds: 2000),
-              pageBuilder: (context, animation, secondaryanimation) =>
-                  MainView(),
-              transitionsBuilder:
-                  (context, animation, secondaryanimation, child) {
-                    const begin = Offset(-1.0, 1.0);
-                    const end = Offset.zero;
-                    const curve = Curves.easeIn;
-
-                    var tween = Tween(
-                      begin: begin,
-                      end: end,
-                    ).chain(CurveTween(curve: curve));
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-            );
           case '/home':
             return MaterialPageRoute(
               builder: (BuildContext context) => const HomeView(),
