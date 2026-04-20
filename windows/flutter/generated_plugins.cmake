@@ -8,7 +8,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_auth
   firebase_auth
   firebase_core
-  firebase_storage
   printing
 )
 

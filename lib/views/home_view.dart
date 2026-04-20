@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo_ui/data/item_model.dart';
 import 'package:flutter_demo_ui/data/user_directory_helper.dart';
+import 'package:flutter_demo_ui/views/import_item_view.dart';
 import 'package:flutter_demo_ui/views/item_detail_view.dart';
 import 'package:flutter_demo_ui/widgets/item_card_widget.dart';
 
@@ -52,9 +54,32 @@ class _HomeViewState extends State<HomeView> {
         icon: const Icon(Icons.add),
         label: const Text('Create Item'),
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _itemsRef().where('ownerUid', isEqualTo: user?.uid).snapshots(),
-        builder: (context, snapshot) {
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ImportItemView(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.download_outlined),
+                label: const Text('Import from SRD'),
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _itemsRef()
+                  .where('ownerUid', isEqualTo: user?.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
               child: Padding(
@@ -100,6 +125,19 @@ class _HomeViewState extends State<HomeView> {
                       'Signed in as ${user?.email ?? 'unknown user'}. Create your first DnD item and it will be stored in Firestore.',
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ImportItemView(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.download_outlined),
+                      label: const Text('Import from SRD'),
+                    ),
                   ],
                 ),
               ),
@@ -111,14 +149,7 @@ class _HomeViewState extends State<HomeView> {
             itemCount: docs.length,
             separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
-              final data = docs[index].data();
-              final itemId = docs[index].id;
-              final name = data['name'] as String? ?? 'Untitled item';
-              final description =
-                  data['description'] as String? ?? 'No description';
-              final rarity = data['rarity'] as String? ?? 'Unknown rarity';
-              final ownerUid = data['ownerUid'] as String? ?? '';
-              final createdAt = data['createdAt'] as Timestamp?;
+              final item = ItemModel.fromDocument(docs[index]);
 
               return InkWell(
                 borderRadius: BorderRadius.circular(18),
@@ -126,26 +157,26 @@ class _HomeViewState extends State<HomeView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ItemDetailView(
-                        itemId: itemId,
-                        name: name,
-                        description: description,
-                        rarity: rarity,
-                        ownerUid: ownerUid,
-                        createdAt: createdAt,
-                      ),
+                      builder: (context) => ItemDetailView(item: item),
                     ),
                   );
                 },
                 child: ItemCardWidget(
-                  name: name,
-                  description: description,
-                  rarity: rarity,
+                  name: item.name,
+                  type: item.type,
+                  description: item.description,
+                  rarity: item.rarity,
+                  attunement: item.attunement,
+                  charges: item.charges,
+                  flavorText: item.flavorText,
                 ),
               );
             },
           );
-        },
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

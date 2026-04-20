@@ -249,30 +249,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.0"
-  firebase_storage:
-    dependency: "direct main"
-    description:
-      name: firebase_storage
-      sha256: d6a0ed2ecb860cbf7537fc94773926036952e89a6ef5b6714673c9d1cb741baa
-      url: "https://pub.dev"
-    source: hosted
-    version: "13.0.6"
-  firebase_storage_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_storage_platform_interface
-      sha256: "99032301dd8ac20acd094270a4472ff8e9510701d9c6ed335df0b91a3ddf4eac"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.2.17"
-  firebase_storage_web:
-    dependency: transitive
-    description:
-      name: firebase_storage_web
-      sha256: d820ddb9419d563f398c85a3c7ad6255af28c3bf9d53d9af7b346b872f54a901
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.11.2"
   firebase_ui_auth:
     dependency: "direct main"
     description:
@@ -336,14 +312,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_to_pdf:
-    dependency: "direct main"
-    description:
-      name: flutter_to_pdf
-      sha256: beaa0840b670c201f49ed0a8ca2e5a889b6cc5221a5330cd7bc2d4e312fddf01
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -382,7 +350,7 @@ packages:
     source: hosted
     version: "1.0.0"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -401,10 +369,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
+      sha256: f9881ff4998044947ec38d098bc7c8316ae1186fa786eddffdb867b9bc94dfce
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.4"
+    version: "4.8.0"
   intl:
     dependency: "direct main"
     description:
@@ -485,14 +453,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.4"
-  nested:
-    dependency: transitive
-    description:
-      name: nested
-      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   objective_c:
     dependency: transitive
     description:
@@ -502,7 +462,7 @@ packages:
     source: hosted
     version: "9.2.5"
   path:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -518,7 +478,7 @@ packages:
     source: hosted
     version: "1.1.0"
   path_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -569,10 +529,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf
-      sha256: "28eacad99bffcce2e05bba24e50153890ad0255294f4dd78a17075a2ba5c8416"
+      sha256: e47a275b267873d5944ad5f5ff0dcc7ac2e36c02b3046a0ffac9b72fd362c44b
       url: "https://pub.dev"
     source: hosted
-    version: "3.11.3"
+    version: "3.12.0"
   pdf_widget_wrapper:
     dependency: transitive
     description:
@@ -609,26 +569,18 @@ packages:
     dependency: transitive
     description:
       name: posix
-      sha256: "6323a5b0fa688b6a010df4905a56b00181479e6d10534cecfecede2aa55add61"
+      sha256: "185ef7606574f789b40f289c233efa52e96dead518aed988e040a10737febb07"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.3"
+    version: "6.5.0"
   printing:
     dependency: "direct main"
     description:
       name: printing
-      sha256: "482cd5a5196008f984bb43ed0e47cbfdca7373490b62f3b27b3299275bf22a93"
+      sha256: "689170c9ddb1bda85826466ba80378aa8993486d3c959a71cd7d2d80cb606692"
       url: "https://pub.dev"
     source: hosted
-    version: "5.14.2"
-  provider:
-    dependency: "direct main"
-    description:
-      name: provider
-      sha256: "4e82183fa20e5ca25703ead7e05de9e4cceed1fbd1eadc1ac3cb6f565a09f272"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.5+1"
+    version: "5.14.3"
   pub_semver:
     dependency: transitive
     description:
@@ -658,46 +610,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
-  sqflite:
-    dependency: "direct main"
-    description:
-      name: sqflite
-      sha256: e2297b1da52f127bc7a3da11439985d9b536f75070f3325e62ada69a5c585d03
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.2"
-  sqflite_android:
-    dependency: transitive
-    description:
-      name: sqflite_android
-      sha256: ecd684501ebc2ae9a83536e8b15731642b9570dc8623e0073d227d0ee2bfea88
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.2+2"
-  sqflite_common:
-    dependency: transitive
-    description:
-      name: sqflite_common
-      sha256: "6ef422a4525ecc601db6c0a2233ff448c731307906e92cabc9ba292afaae16a6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.6"
-  sqflite_darwin:
-    dependency: transitive
-    description:
-      name: sqflite_darwin
-      sha256: "279832e5cde3fe99e8571879498c9211f3ca6391b0d818df4e17d9fff5c6ccb3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.2"
-  sqflite_platform_interface:
-    dependency: transitive
-    description:
-      name: sqflite_platform_interface
-      sha256: "8dd4515c7bdcae0a785b0062859336de775e8c65db81ae33dd5445f35be61920"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.0"
   stack_trace:
     dependency: transitive
     description:
@@ -722,14 +634,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      sha256: c254ade258ec8282947a0acbbc90b9575b4f19673533ee46f2f6e9b3aeefd7c0
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.0"
   term_glyph:
     dependency: transitive
     description:

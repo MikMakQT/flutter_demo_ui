@@ -1,58 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo_ui/data/item_model.dart';
 import 'package:flutter_demo_ui/data/user_directory_helper.dart';
 import 'package:flutter_demo_ui/views/edit_item_view.dart';
+import 'package:flutter_demo_ui/services/pdf_service.dart';
 import 'package:flutter_demo_ui/widgets/item_card_widget.dart';
 import 'package:intl/intl.dart';
 
 class ItemDetailView extends StatefulWidget {
   const ItemDetailView({
     super.key,
-    required this.itemId,
-    required this.name,
-    required this.description,
-    required this.rarity,
-    required this.ownerUid,
-    required this.createdAt,
+    required this.item,
   });
 
-  final String itemId;
-  final String name;
-  final String description;
-  final String rarity;
-  final String ownerUid;
-  final Timestamp? createdAt;
+  final ItemModel item;
 
   @override
   State<ItemDetailView> createState() => _ItemDetailViewState();
 }
 
 class _ItemDetailViewState extends State<ItemDetailView> {
-  late String _name;
-  late String _description;
-  late String _rarity;
-  late String _ownerUid;
-  late Timestamp? _createdAt;
+  final _pdfService = PdfService();
+  late ItemModel _item;
 
   @override
   void initState() {
     super.initState();
-    _name = widget.name;
-    _description = widget.description;
-    _rarity = widget.rarity;
-    _ownerUid = widget.ownerUid;
-    _createdAt = widget.createdAt;
+    _item = widget.item;
   }
 
-  bool get _isOwner => FirebaseAuth.instance.currentUser?.uid == _ownerUid;
+  bool get _isOwner => FirebaseAuth.instance.currentUser?.uid == _item.ownerUid;
 
   String _formattedCreatedAt() {
-    if (_createdAt == null) {
-      return 'Not available yet';
-    }
-
-    return DateFormat('dd.MM.yyyy HH:mm').format(_createdAt!.toDate());
+    return DateFormat('dd.MM.yyyy HH:mm').format(_item.createdAt.toDate());
   }
 
   Future<void> _editItem() async {
@@ -60,10 +41,10 @@ class _ItemDetailViewState extends State<ItemDetailView> {
       context,
       MaterialPageRoute(
         builder: (context) => EditItemView(
-          itemId: widget.itemId,
-          name: _name,
-          description: _description,
-          rarity: _rarity,
+          itemId: _item.id ?? '',
+          name: _item.name,
+          description: _item.description,
+          rarity: _item.rarity,
         ),
       ),
     );
@@ -73,13 +54,23 @@ class _ItemDetailViewState extends State<ItemDetailView> {
     }
 
     setState(() {
-      _name = result['name'] as String? ?? _name;
-      _description = result['description'] as String? ?? _description;
-      _rarity = result['rarity'] as String? ?? _rarity;
+      _item = _item.copyWith(
+        name: result['name'] as String? ?? _item.name,
+        description: result['description'] as String? ?? _item.description,
+        rarity: result['rarity'] as String? ?? _item.rarity,
+      );
     });
   }
 
   Future<void> _deleteItem() async {
+    final itemId = _item.id;
+    if (itemId == null || itemId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This item cannot be deleted right now.')),
+      );
+      return;
+    }
+
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -104,7 +95,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
 
     await FirebaseFirestore.instance
         .collection('items')
-        .doc(widget.itemId)
+        .doc(itemId)
         .delete();
 
     if (!mounted) {
@@ -115,6 +106,14 @@ class _ItemDetailViewState extends State<ItemDetailView> {
   }
 
   Future<void> _shareItem() async {
+    final itemId = _item.id;
+    if (itemId == null || itemId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This item cannot be shared right now.')),
+      );
+      return;
+    }
+
     final controller = TextEditingController();
 
     try {
@@ -176,9 +175,9 @@ class _ItemDetailViewState extends State<ItemDetailView> {
 
       await FirebaseFirestore.instance
           .collection('shared_items')
-          .doc('${toUserUid}_${widget.itemId}')
+          .doc('${toUserUid}_$itemId')
           .set({
-        'itemId': widget.itemId,
+        'itemId': itemId,
         'fromUserUid': authUid,
         'toUserUid': toUserUid,
         'createdAt': FieldValue.serverTimestamp(),
@@ -196,38 +195,82 @@ class _ItemDetailViewState extends State<ItemDetailView> {
     }
   }
 
+  Future<void> _printItem() async {
+    try {
+      await _pdfService.printItem(_item);
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to print item: $e')),
+      );
+    }
+  }
+
+  Future<void> _saveAsPdf() async {
+    try {
+      await _pdfService.saveItemPdf(_item);
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save PDF: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ownerActions = _isOwner
+        ? [
+            IconButton(
+              onPressed: _editItem,
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Edit',
+            ),
+            IconButton(
+              onPressed: _shareItem,
+              icon: const Icon(Icons.share_outlined),
+              tooltip: 'Share',
+            ),
+            IconButton(
+              onPressed: _deleteItem,
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete',
+            ),
+          ]
+        : const <Widget>[];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Item Details'),
-        actions: _isOwner
-            ? [
-                IconButton(
-                  onPressed: _editItem,
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit',
-                ),
-                IconButton(
-                  onPressed: _shareItem,
-                  icon: const Icon(Icons.share_outlined),
-                  tooltip: 'Share',
-                ),
-                IconButton(
-                  onPressed: _deleteItem,
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete',
-                ),
-              ]
-            : null,
+        actions: [
+          IconButton(
+            onPressed: _printItem,
+            icon: const Icon(Icons.print_outlined),
+            tooltip: 'Print Item',
+          ),
+          IconButton(
+            onPressed: _saveAsPdf,
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            tooltip: 'Save as PDF',
+          ),
+          ...ownerActions,
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           ItemCardWidget(
-            name: _name,
-            description: _description,
-            rarity: _rarity,
+            name: _item.name,
+            type: _item.type,
+            description: _item.description,
+            rarity: _item.rarity,
+            attunement: _item.attunement,
+            charges: _item.charges,
+            flavorText: _item.flavorText,
           ),
           const SizedBox(height: 20),
           Card(
@@ -244,11 +287,26 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text('Name: $_name'),
+                  Text('Name: ${_item.name}'),
                   const SizedBox(height: 8),
-                  Text('Rarity: $_rarity'),
+                  Text('Type: ${_item.type}'),
                   const SizedBox(height: 8),
-                  Text('Description: $_description'),
+                  Text('Rarity: ${_item.rarity}'),
+                  const SizedBox(height: 8),
+                  Text('Description: ${_item.description}'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Attunement: ${_item.attunement ? 'Required' : 'Not required'}',
+                  ),
+                  if (_item.charges != null) ...[
+                    const SizedBox(height: 8),
+                    Text('Charges: ${_item.charges}'),
+                  ],
+                  if (_item.flavorText != null &&
+                      _item.flavorText!.trim().isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text('Flavor Text: ${_item.flavorText}'),
+                  ],
                   const SizedBox(height: 8),
                   Text('Created: ${_formattedCreatedAt()}'),
                 ],

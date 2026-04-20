@@ -8,7 +8,9 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'views/create_item_view.dart';
 import 'views/home_view.dart';
+import 'views/import_item_view.dart';
 import 'views/main_view.dart';
+import 'views/profile_view.dart';
 import 'views/shared_items_view.dart';
 
 Future<void> main() async {
@@ -69,7 +71,12 @@ class MyApp extends StatelessWidget {
             );
           case '/create_item':
             return MaterialPageRoute(
-              builder: (BuildContext context) => const CreateItemScreen(),
+              builder: (BuildContext context) => const CreateItemView(),
+              settings: settings,
+            );
+          case '/import_item':
+            return MaterialPageRoute(
+              builder: (BuildContext context) => const ImportItemView(),
               settings: settings,
             );
           case '/shared_items':
@@ -96,13 +103,8 @@ class MyApp extends StatelessWidget {
 
           case '/profile':
             return MaterialPageRoute(
-              builder: (BuildContext context) => ProfileScreen(
+              builder: (BuildContext context) => ProfileView(
                 providers: providers,
-                actions: [
-                  SignedOutAction((context) {
-                    Navigator.pushReplacementNamed(context, '/sign-in');
-                  }),
-                ],
               ),
               settings: settings,
             );

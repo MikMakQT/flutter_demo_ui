@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo_ui/data/item_model.dart';
 import 'package:flutter_demo_ui/views/item_detail_view.dart';
 import 'package:flutter_demo_ui/widgets/item_card_widget.dart';
 
@@ -99,14 +100,7 @@ class SharedItemsView extends StatelessWidget {
                     );
                   }
 
-                  final itemData = itemDoc.data() ?? {};
-                  final name = itemData['name'] as String? ?? 'Untitled item';
-                  final description =
-                      itemData['description'] as String? ?? 'No description';
-                  final rarity =
-                      itemData['rarity'] as String? ?? 'Unknown rarity';
-                  final ownerUid = itemData['ownerUid'] as String? ?? '';
-                  final createdAt = itemData['createdAt'] as Timestamp?;
+                  final item = ItemModel.fromDocument(itemDoc);
 
                   return InkWell(
                     borderRadius: BorderRadius.circular(18),
@@ -114,21 +108,18 @@ class SharedItemsView extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ItemDetailView(
-                            itemId: itemDoc.id,
-                            name: name,
-                            description: description,
-                            rarity: rarity,
-                            ownerUid: ownerUid,
-                            createdAt: createdAt,
-                          ),
+                          builder: (context) => ItemDetailView(item: item),
                         ),
                       );
                     },
                     child: ItemCardWidget(
-                      name: name,
-                      description: description,
-                      rarity: rarity,
+                      name: item.name,
+                      type: item.type,
+                      description: item.description,
+                      rarity: item.rarity,
+                      attunement: item.attunement,
+                      charges: item.charges,
+                      flavorText: item.flavorText,
                     ),
                   );
                 },
