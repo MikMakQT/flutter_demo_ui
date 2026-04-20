@@ -1,34 +1,23 @@
-import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_demo_ui/data/db_helper.dart';
-import 'package:flutter_demo_ui/data/todo_list_manager.dart';
+import 'package:flutter_demo_ui/data/user_directory_helper.dart';
 import 'package:flutter_demo_ui/firebase_options.dart';
-import 'package:flutter_demo_ui/views/input_view.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'views/create_item_view.dart';
+import 'views/home_view.dart';
 import 'views/main_view.dart';
-import 'views/todo_list_view.dart';
+import 'views/shared_items_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await DatabaseHelper.instance.init();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) {
-        var model = TodoListManager();
-        model.init();
-        return model;
-      },
-      child: const MyApp(),
-    ),
-  );
+  try {
+    await UserDirectoryHelper.ensureCurrentUserProfile();
+  } catch (_) {}
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,18 +25,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String appTitle = 'Flutter Layout Demo';
+    const String appTitle = 'DnD Item Maker';
     final providers = [EmailAuthProvider()];
 
     void onSignedIn(BuildContext context) {
-      Navigator.pushReplacementNamed(context, '/todo_list');
+      UserDirectoryHelper.ensureCurrentUserProfile().catchError((_) {});
+      Navigator.pushReplacementNamed(context, '/home');
     }
 
     return MaterialApp(
       title: appTitle,
       initialRoute: FirebaseAuth.instance.currentUser == null
           ? '/sign-in'
-          : '/todo_list',
+          : '/home',
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/info':
@@ -72,15 +62,19 @@ class MyApp extends StatelessWidget {
                     );
                   },
             );
-
-          case '/todo_list':
+          case '/home':
             return MaterialPageRoute(
-              builder: (BuildContext context) => TodoListView(),
+              builder: (BuildContext context) => const HomeView(),
               settings: settings,
             );
-          case '/input':
+          case '/create_item':
             return MaterialPageRoute(
-              builder: (BuildContext context) => InputView(),
+              builder: (BuildContext context) => const CreateItemScreen(),
+              settings: settings,
+            );
+          case '/shared_items':
+            return MaterialPageRoute(
+              builder: (BuildContext context) => const SharedItemsView(),
               settings: settings,
             );
           case '/sign-in':

@@ -12,7 +12,7 @@ class MainView extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/todo_list');
+              Navigator.pushNamed(context, '/home');
             },
             icon: Icon(Icons.list),
           ),
